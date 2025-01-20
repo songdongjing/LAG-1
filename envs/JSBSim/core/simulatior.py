@@ -165,7 +165,7 @@ class AircraftSimulator(BaseSimulator):
         self.jsbsim_exec = jsbsim.FGFDMExec(os.path.join(get_root_dir(), 'data'))
         self.jsbsim_exec.set_debug_level(0)
         self.jsbsim_exec.load_model(self.model)
-        Catalog.add_jsbsim_props(self.jsbsim_exec.query_property_catalog(""))
+        Catalog.add_jsbsim_props(self.jsbsim_exec.query_property_catalog("").split("\n"))
         self.jsbsim_exec.set_dt(self.dt)
         self.clear_defalut_condition()
 

@@ -13,6 +13,7 @@ def _t2n(x):
 
 class Runner(object):
     def __init__(self, config):
+        self.writer = config['writer']
 
         self.all_args = config['all_args']
         self.envs = config['envs']
@@ -120,8 +121,9 @@ class Runner(object):
             for k, v in infos.items():
                 wandb.log({k: v}, step=total_num_steps)
         else:
-            pass
-        
+            for k, v in infos.items():#use tensorboard
+                self.writer.add_scalar(k, v, total_num_steps)
+
     def render_with_tacview(self, data):
         """
         Send data to Tacview for real-time rendering.
