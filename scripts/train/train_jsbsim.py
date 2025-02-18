@@ -17,8 +17,6 @@ from envs.JSBSim.envs import SingleCombatEnv, SingleControlEnv, MultipleCombatEn
 from envs.env_wrappers import SubprocVecEnv, DummyVecEnv, ShareSubprocVecEnv, ShareDummyVecEnv
 from runner.tacview import Tacview
 
-import torch.utils.tensorboard as tb
-
 def make_train_env(all_args):
     def get_env_fn(rank):
         def init_env():
@@ -43,7 +41,7 @@ def make_train_env(all_args):
         if all_args.n_rollout_threads == 1:
             return DummyVecEnv([get_env_fn(0)])
         else:
-            return SubprocVecEnv([get_env_fn(i) for i in range(all_args.n_rollout_threads)]) #64/4=16个线程跑满
+            return SubprocVecEnv([get_env_fn(i) for i in range(all_args.n_rollout_threads)])
 
 
 def make_eval_env(all_args):
@@ -86,8 +84,6 @@ def parse_args(args, parser):
 def main(args):
     parser = get_config()
     all_args = parse_args(args, parser)
-
-    all_args.n_rollout_threads = os.cpu_count() * 4
 
     # seed
     np.random.seed(all_args.seed)
@@ -136,8 +132,6 @@ def main(args):
         if not run_dir.exists():
             os.makedirs(str(run_dir))
 
-    writer = tb.SummaryWriter(run_dir)
-
     setproctitle.setproctitle(str(all_args.algorithm_name) + "-" + str(all_args.env_name)
                               + "-" + str(all_args.experiment_name) + "@" + str(all_args.user_name))
 
@@ -153,9 +147,7 @@ def main(args):
         "eval_envs": eval_envs,
         "device": device,
         "run_dir": run_dir,
-        "render_mode": render_mode,
-
-        "writer": writer
+        "render_mode": render_mode
     }
 
     # run experiments

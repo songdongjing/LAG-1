@@ -77,6 +77,7 @@ class ReplayBuffer(Buffer):
 
     def insert(self,
                obs: np.ndarray,
+
                actions: np.ndarray,
                rewards: np.ndarray,
                masks: np.ndarray,

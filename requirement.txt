@@ -1,0 +1,1 @@
+pip install wandb gymnasium jsbsim pymap3d tensorboard

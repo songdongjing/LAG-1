@@ -28,8 +28,13 @@ class SelfplayJSBSimRunner(JSBSimRunner):
         if self.algorithm_name == "ppo":
             from algorithms.ppo.ppo_trainer import PPOTrainer as Trainer
             from algorithms.ppo.ppo_policy import PPOPolicy as Policy
+        elif self.algorithm_name == "dsac":
+            from algorithms.dsac.dsac_trainer import DSACTrainer as Trainer
+            from algorithms.dsac.dsac_policy import DSACPolicy as Policy
         else:
             raise NotImplementedError
+        
+        
         self.policy = Policy(self.all_args, self.obs_space, self.act_space, device=self.device)
         self.trainer = Trainer(self.all_args, device=self.device)
 
@@ -121,6 +126,8 @@ class SelfplayJSBSimRunner(JSBSimRunner):
         masks = masks[:, :self.num_agents // 2, ...]
 
         self.buffer.insert(obs, actions, rewards, masks, action_log_probs, values, rnn_states_actor, rnn_states_critic)
+
+        
 
     @torch.no_grad()
     def eval(self, total_num_steps):
@@ -255,8 +262,8 @@ class SelfplayJSBSimRunner(JSBSimRunner):
     def save(self, episode):
         policy_actor_state_dict = self.policy.actor.state_dict()
         torch.save(policy_actor_state_dict, str(self.save_dir) + '/actor_latest.pt')
-        policy_critic_state_dict = self.policy.critic.state_dict()
-        torch.save(policy_critic_state_dict, str(self.save_dir) + '/critic_latest.pt')
+        # policy_critic_state_dict = self.policy.critic.state_dict()
+        # torch.save(policy_critic_state_dict, str(self.save_dir) + '/critic_latest.pt')
         # [Selfplay] save policy & performance
         torch.save(policy_actor_state_dict, str(self.save_dir) + f'/actor_{episode}.pt')
         self.policy_pool[str(episode)] = self.latest_elo

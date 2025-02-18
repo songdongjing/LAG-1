@@ -13,13 +13,17 @@ def _t2n(x):
 
 class Runner(object):
     def __init__(self, config):
-        self.writer = config['writer']
 
         self.all_args = config['all_args']
         self.envs = config['envs']
         self.eval_envs = config['eval_envs']
         self.device = config['device']
         self.render_mode = config['render_mode']
+
+        try:
+            self.writer = config['writer']
+        except:
+            self.writer = None
         
         # Tacview render obj
         self.tacview = None
@@ -61,13 +65,27 @@ class Runner(object):
         if self.algorithm_name == "ppo":
             from ..algorithms.ppo.ppo_trainer import PPOTrainer as Trainer
             from ..algorithms.ppo.ppo_policy import PPOPolicy as Policy
+        elif self.algorithm_name == "dsac":
+            from ..algorithms.dsac.dsac_trainer import DSACTrainer as Trainer
+            from ..algorithms.dsac.dsac_policy import DSACPolicy as Policy
+            from ..algorithms.dsac.dsac_policy import DSACCritic as Critic
         else:
             raise NotImplementedError
-        self.policy = Policy(self.all_args,
-                             self.envs.observation_space,
-                             self.envs.action_space,
-                             device=self.device)
-        self.trainer = Trainer(self.all_args, self.policy, device=self.device)
+        
+        if self.algorithm_name == "dsac":
+            self.policy = Policy(self.all_args, self.obs_space, self.act_space, device=self.device)
+            self.critic1 = Critic(self.all_args, self.envs.observation_space, self.device)
+            self.critic2 = Critic(self.all_args, self.envs.observation_space, self.device)
+            self.target_critic1 = Critic(self.all_args, self.envs.observation_space, self.device)
+            self.target_critic2 = Critic(self.all_args, self.envs.observation_space, self.device)
+            self.target_critic1.load_state_dict(self.critic1.state_dict())
+            self.target_critic2.load_state_dict(self.critic2.state_dict())
+            self.trainer = Trainer(self.all_args, device=self.device)
+        elif self.algorithm_name == "ppo":
+            self.policy = Policy(self.all_args, self.obs_space, self.act_space, device=self.device)
+            self.trainer = Trainer(self.all_args, device=self.device)
+        else:
+            raise NotImplementedError
 
         # buffer
         self.buffer = ReplayBuffer(self.all_args,

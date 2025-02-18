@@ -59,8 +59,8 @@ class PPOTrainer():
 
         policy_entropy_loss = -dist_entropy.mean()
 
-        loss = policy_loss + value_loss * self.value_loss_coef + policy_entropy_loss * self.entropy_coef
-
+        # loss = policy_loss + value_loss * self.value_loss_coef + policy_entropy_loss * self.entropy_coef
+        loss = policy_loss + value_loss * self.value_loss_coef
         # Optimize the loss function
         policy.optimizer.zero_grad()
         loss.backward()

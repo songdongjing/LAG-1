@@ -22,10 +22,27 @@ class JSBSimRunner(Runner):
         if self.algorithm_name == "ppo":
             from algorithms.ppo.ppo_trainer import PPOTrainer as Trainer
             from algorithms.ppo.ppo_policy import PPOPolicy as Policy
+        elif self.algorithm_name == "dsac":
+            from algorithms.dsac.dsac_trainer import DSACTrainer as Trainer
+            from algorithms.dsac.dsac_policy import DSACPolicy as Policy
+            from algorithms.dsac.dsac_policy import DSACCritic as Critic
         else:
             raise NotImplementedError
-        self.policy = Policy(self.all_args, self.obs_space, self.act_space, device=self.device)
-        self.trainer = Trainer(self.all_args, device=self.device)
+
+        if self.algorithm_name == "dsac":
+            self.policy = Policy(self.all_args, self.obs_space, self.act_space, device=self.device)
+            self.critic1 = Critic(self.all_args, self.envs.observation_space, self.device)
+            self.critic2 = Critic(self.all_args, self.envs.observation_space, self.device)
+            self.target_critic1 = Critic(self.all_args, self.envs.observation_space, self.device)
+            self.target_critic2 = Critic(self.all_args, self.envs.observation_space, self.device)
+            self.target_critic1.load_state_dict(self.critic1.state_dict())
+            self.target_critic2.load_state_dict(self.critic2.state_dict())
+            self.trainer = Trainer(self.all_args, device=self.device)
+        elif self.algorithm_name == "ppo":
+            self.policy = Policy(self.all_args, self.obs_space, self.act_space, device=self.device)
+            self.trainer = Trainer(self.all_args, device=self.device)
+        else:
+            raise NotImplementedError
 
         # buffer
         self.buffer = ReplayBuffer(self.all_args, self.num_agents, self.obs_space, self.act_space)
@@ -33,17 +50,19 @@ class JSBSimRunner(Runner):
         if self.model_dir is not None:
             self.restore()
 
+    ## 在这里开始
     def run(self):
         self.warmup()
 
         start = time.time()
         self.total_num_steps = 0
-        episodes = self.num_env_steps // self.buffer_size // self.n_rollout_threads
-
+        episodes = self.num_env_steps // self.buffer_size // self.n_rollout_threads ##3e6/3000/5
+        print(episodes)
+        g = 0
         for episode in range(episodes):
-
+            g += 1
             heading_turns_list = []
-
+            print(g)
             for step in range(self.buffer_size):
                 # Sample actions
                 values, actions, action_log_probs, rnn_states_actor, rnn_states_critic = self.collect(step)
@@ -80,7 +99,7 @@ class JSBSimRunner(Runner):
                                      self.total_num_steps,
                                      self.num_env_steps,
                                      int(self.total_num_steps / (end - start))))
-
+            
                 train_infos["average_episode_rewards"] = self.buffer.rewards.sum() / (self.buffer.masks == False).sum()
                 logging.info("average episode rewards is {}".format(train_infos["average_episode_rewards"]))
 
@@ -195,6 +214,8 @@ class JSBSimRunner(Runner):
         render_masks = np.ones((1, *self.buffer.masks.shape[2:]), dtype=np.float32)
         render_rnn_states = np.zeros((1, *self.buffer.rnn_states_actor.shape[2:]), dtype=np.float32)
         self.envs.render(mode=self.render_mode, filepath=f'{self.run_dir}/{self.experiment_name}.txt.acmi',tacview=self.tacview)
+
+        file = open("output.txt", "a")
         while True:
             self.policy.prep_rollout()
             render_actions, render_rnn_states = self.policy.act(np.concatenate(render_obs),
@@ -203,9 +224,15 @@ class JSBSimRunner(Runner):
                                                                 deterministic=True)
             render_actions = np.expand_dims(_t2n(render_actions), axis=0)
             render_rnn_states = np.expand_dims(_t2n(render_rnn_states), axis=0)
-
+            file.write(f"render_obs: {render_obs} ")
+            file.write(f"render_actions: {render_actions} ")
             # Obser reward and next obs
             render_obs, render_rewards, render_dones, render_infos = self.envs.step(render_actions)
+
+            file.write(f"render_next_obs: {render_obs} ")
+            file.write(f"render_rewards: {render_rewards} ")
+            file.write(f"render_dones: {render_dones}\n")
+            
             if self.use_selfplay:
                 render_rewards = render_rewards[:, :self.num_agents // 2, ...]
             render_episode_rewards += render_rewards

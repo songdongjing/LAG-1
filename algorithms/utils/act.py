@@ -55,17 +55,8 @@ class ACTLayer(nn.Module):
             raise NotImplementedError(f"Unsupported action space type: {type(act_space)}!")
 
     def forward(self, x, deterministic=False, **kwargs):
-        """
-        Compute actions and action logprobs from given input.
-
-        Args:
-            x (torch.Tensor): input to network.
-            deterministic (bool): whether to sample from action distribution or return the mode.
-
-        Returns:
-            actions (torch.Tensor): actions to take.
-            action_log_probs (torch.Tensor): log probabilities of taken actions.
-        """
+        # print("_multidiscrete_action", self._multidiscrete_action)
+        # print("_shoot_action", self._shoot_action)
         if self._mlp_actlayer:
             x = self.mlp(x)
 
