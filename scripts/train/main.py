@@ -130,10 +130,7 @@ def input_args(all_args,algorithm_name="dsac"):
     all_args.use_prior=True
     all_args.selfplay_algorithm="fsp"
 
-    # all_args.model_dir="/home/sdj/home/sdj/graduation/final/LAG-masterv2/scripts/results/SingleCombat/1v1/ShootMissile/Selfplay/ppo/v1/"
-
-
-
+    # 
     return all_args
 
 def main(args):
@@ -141,6 +138,8 @@ def main(args):
     all_args = parse_args(args, parser)
     all_args = input_args(all_args,"ppo")
     # all_args = input_args_ppo(all_args)
+
+    # all_args.model_dir="/home/sdj/home/sdj/graduation/final/LAG-1/scripts/results/SingleCombat/1v1/ShootMissile/Selfplay/ppo/v1/2025-02-19"
 
     all_args.use_wandb=False
 

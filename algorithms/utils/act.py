@@ -1,10 +1,9 @@
 import gymnasium as gym
 import torch
 import torch.nn as nn
-
 from .distributions import BetaShootBernoulli, Categorical, DiagGaussian, Bernoulli
 from .mlp import MLPLayer
-
+from .transformer import StableTransformerXL
 
 class ACTLayer(nn.Module):
     def __init__(self, act_space, input_dim, hidden_size, activation_id, gain):
@@ -14,7 +13,8 @@ class ACTLayer(nn.Module):
         self._multidiscrete_action = False
         self._mixed_action = False
         self._shoot_action = False
-
+        self.memory = None
+        self.transformer = StableTransformerXL(d_input=128, n_layers=4, n_heads=3, d_head_inner=32, d_ff_inner=64)
         if len(hidden_size) > 0:
             self._mlp_actlayer = True
             self.mlp = MLPLayer(input_dim, hidden_size, activation_id)
@@ -55,11 +55,11 @@ class ACTLayer(nn.Module):
             raise NotImplementedError(f"Unsupported action space type: {type(act_space)}!")
 
     def forward(self, x, deterministic=False, **kwargs):
-        # print("_multidiscrete_action", self._multidiscrete_action)
-        # print("_shoot_action", self._shoot_action)
+
         if self._mlp_actlayer:
             x = self.mlp(x)
-
+            if deterministic == False:
+               x = self.transformer(x, self.memory)
         if self._multidiscrete_action:
             actions = []
             action_log_probs = []
