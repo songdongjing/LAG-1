@@ -16,9 +16,11 @@ class PPOActor(nn.Module):
         self.act_hidden_size = args.act_hidden_size
         self.activation_id = args.activation_id
         self.use_feature_normalization = args.use_feature_normalization
+
         self.use_recurrent_policy = args.use_recurrent_policy
         self.recurrent_hidden_size = args.recurrent_hidden_size
         self.recurrent_hidden_layers = args.recurrent_hidden_layers
+
         self.tpdv = dict(dtype=torch.float32, device=device)
         self.use_prior = args.use_prior
         # (1) feature extraction module

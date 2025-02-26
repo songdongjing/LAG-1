@@ -87,7 +87,8 @@ class PPOTrainer():
             if self.use_recurrent_policy:
                 data_generator = ReplayBuffer.recurrent_generator(buffer, self.num_mini_batch, self.data_chunk_length)
             else:
-                raise NotImplementedError
+                data_generator = ReplayBuffer.recurrent_generator(buffer, self.num_mini_batch, self.data_chunk_length)
+                # raise NotImplementedError
 
             for sample in data_generator:
 

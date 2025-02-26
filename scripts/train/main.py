@@ -122,9 +122,13 @@ def input_args(all_args,algorithm_name="dsac"):
 
     all_args.hidden_size = "128 128"
     all_args.act_hidden_size = "128 128"
+
+    #使用GRU
+    all_args.use_recurrent_policy=True
     all_args.recurrent_hidden_size = 128
     all_args.recurrent_hidden_layers = 1
     all_args.data_chunk_length = 8
+
 
     all_args.use_selfplay=True
     all_args.use_prior=True
@@ -162,9 +166,10 @@ def main(args):
         torch.set_num_threads(all_args.n_training_threads)
 
     # run dir
-    today = date.today().strftime("%Y-%m-%d")
+    # today = date.today().strftime("%Y-%m-%d")
+    name="MEPPO+20thread+GRU"
     run_dir = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/results") \
-        / all_args.env_name / all_args.scenario_name / all_args.algorithm_name / all_args.experiment_name / today
+        / all_args.env_name / all_args.scenario_name / all_args.algorithm_name / all_args.experiment_name / name
     if not run_dir.exists():
         os.makedirs(str(run_dir))
 
