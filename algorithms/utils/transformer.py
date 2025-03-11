@@ -294,7 +294,7 @@ class StableTransformerXL(torch.nn.Module):
     def forward(self, inputs, memory=None):
         """
         + Arguments
-            - inputs - torch.FloatTensor = [T x B x d_inner] = [20 x 5 x 8]
+            - inputs - torch.FloatTensor = [thread*2,mlpoutput] = [20 x 128]
             - memory - Optional, list[torch.FloatTensor] = [[T x B x d_inner] x 5]
         """
         if memory is None:

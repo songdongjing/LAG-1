@@ -78,29 +78,58 @@ def _t2n(x):
 
 def env_parallel(ego_model, enm_model, seed):
 
-    env = SingleCombatEnv("1v1/ShootMissile/Selfplay")
-    env.seed(seed)
-    num_agents = 2
+    ego_configs = {
+        "camp": "red",
+        "config": {
+            "user_id": "admin",
+            "password": "123456",
+            "simulation_id": "uav_v1.0",
+            "ip_address": None,
+            "suffix": "_a1",
+            "timeout": 0.5,
+            "scenario_name": "SingleCombat/SingleCombat2.xml"
+        },
+        "action": {
+            "discrete": True,
+            "action_range": False,
+            "rescale": False
+        },
+        "reward": {
+            "step": {
+                "goal_achieved": 1,
+                "goal_failed": 0,
+                "delt_time": 0
+            },
+            "end": {
+                "win": 100,
+                "loss": -10000,
+                "accident": -10000
+            },
+            "time_limit": 1500,
+            "sleep_time": 0
+        },
+        "seed": seed,
+        "random": True,
+        "num_missiles": 1
+    }
+
+    env = SingleCombatEnv(ego_configs)
+    obs_shape = env.observation_space.shape
+    num_agents = env.num_agents
     device = torch.device("cpu")
-    # 获取正确的observation_space而不是shape
-    observation_space = env.observation_space
     act_space = env.action_space
     ego_args = Args()
     enm_args = Args()
-    # 使用observation_space而不是obs_shape
-    ego_policy = PPOActor(ego_args, observation_space, act_space, device)
-    enm_policy = PPOActor(enm_args, observation_space, act_space, device)
+    ego_policy = PPOActor(ego_args, obs_shape, act_space, device)
+    enm_policy = PPOActor(enm_args, obs_shape, act_space, device)
     ego_policy.load_state_dict(torch.load(ego_model))
-    
-    # 使用dodge_missile_model.pt作为敌方模型
-    dodge_missile_path = "/home/sdj/home/sdj/graduation/final/LAG-1/envs/JSBSim/model/dodge_missile_model.pt"
+    # 忽略传入的enm_model，固定使用dodge_missile_model.pt
+    dodge_missile_model = "dodge_missile_model.pt"
     try:
-        print(f"正在加载敌方闪避导弹模型: {dodge_missile_path}")
-        enm_policy.load_state_dict(torch.load(dodge_missile_path))
-        print(f"成功加载dodge_missile_model.pt")
+        enm_policy.load_state_dict(torch.load(dodge_missile_model))
+        print(f"成功加载敌方模型: {dodge_missile_model}")
     except Exception as e:
-        print(f"加载dodge_missile_model.pt失败: {e}")
-        print(f"回退使用默认模型: {enm_model}")
+        print(f"无法加载dodge_missile_model.pt: {e}，使用传入的模型: {enm_model}")
         enm_policy.load_state_dict(torch.load(enm_model))
 
     episode_opp_rewards = 0
