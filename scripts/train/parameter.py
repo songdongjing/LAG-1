@@ -88,7 +88,7 @@ def input_args(all_args,algorithm_name="dsac"):
     all_args.act_hidden_size = "128 128"
 
     #使用GRU
-    all_args.use_recurrent_policy=False
+    all_args.use_recurrent_policy=True
     all_args.recurrent_hidden_size = 128
     all_args.recurrent_hidden_layers = 1
     all_args.data_chunk_length = 8
