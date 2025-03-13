@@ -424,6 +424,7 @@ class MissileSimulator(BaseSimulator):
         return np.linalg.norm(self.target_aircraft.get_position() - self.get_position())
 
     def launch(self, parent: AircraftSimulator):
+        print(f"导弹发射")
         # inherit kinetic parameters from parent aricraft
         self.parent_aircraft = parent
         self.parent_aircraft.launch_missiles.append(self)

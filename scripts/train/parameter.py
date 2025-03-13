@@ -52,9 +52,11 @@ def parse_args(args, parser):
 #算法参数配置
 
 #所有的参数可以在config.py中设置
-def input_args(all_args,algorithm_name="ppo",vsbaseline=False):
+def input_args(all_args,algorithm_name="ppo",vsbaseline=False,render_mode="txt"):
     all_args.env_name = "SingleCombat" #1V1空战环境 
     all_args.algorithm_name = algorithm_name  #算法名称
+    all_args.render_mode = render_mode #渲染模式
+    all_args.eval_interval = 1
     if vsbaseline:
         all_args.scenario_name = "1v1/ShootMissile/VsBaseline_nolimitSelfpaly"
         all_args.use_selfplay=False
@@ -62,7 +64,7 @@ def input_args(all_args,algorithm_name="ppo",vsbaseline=False):
         all_args.scenario_name = "/home/sdj/home/sdj/graduation/final/LAG-1/envs/JSBSim/configs/1v1/ShootMissile/Selfplay_fardistance" #环境名称
         all_args.use_selfplay=False
         all_args.selfplay_algorithm="pfsp" #优先级自博弈
-    all_args.experiment_name = "v1" #实验名称
+    all_args.experiment_name = "学习率1e-4" #实验名称
     all_args.use_prior=True #alpha-beta分布先验
 
     all_args.seed = random.randint(0, 1000000)
@@ -82,8 +84,7 @@ def input_args(all_args,algorithm_name="ppo",vsbaseline=False):
     all_args.num_env_steps = 5e5
     all_args.max_grad_norm = 0.5
 
-    all_args.lr = 3e-4
-    # all_args.lr =1e-4
+    all_args.lr =1e-4
     all_args.gamma = 0.99
     all_args.max_grad_norm = 2
     all_args.entropy_coef=1e-3

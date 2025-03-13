@@ -26,7 +26,7 @@ def main(args):
     #算法参数设置，在parameter.py中设置
     parser = get_config()
     all_args = parse_args(args, parser)
-    all_args = input_args(all_args,"ppo",vsbaseline=True)
+    all_args = input_args(all_args,"ppo",vsbaseline=True,render_mode="real_time")
     all_args.use_wandb=False
 
     # seed
@@ -48,7 +48,7 @@ def main(args):
         torch.set_num_threads(all_args.n_training_threads)
 
     # run dir
-    name="test"  #训练文件名字
+    name="加上导弹惩罚"  #训练文件名字
     run_dir = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/results") \
         / all_args.env_name / all_args.scenario_name / all_args.algorithm_name / all_args.experiment_name / name
     if not run_dir.exists():
@@ -63,15 +63,13 @@ def main(args):
     envs = make_train_env(all_args)
     eval_envs = make_eval_env(all_args) if all_args.use_eval else None
 
-    render_mode = all_args.render_mode
-    
     config = {
         "all_args": all_args,
         "envs": envs,
         "eval_envs": eval_envs,
         "device": device,
         "run_dir": run_dir,
-        "render_mode": render_mode,
+        "render_mode": all_args.render_mode,
 
         "writer": writer
     }
