@@ -5,7 +5,10 @@ from typing import List
 from .base_runner import Runner, ReplayBuffer
 from .jsbsim_runner import JSBSimRunner
 
-
+#############################
+# 数据收集
+#这里采集的数据是最新一代智能体和自己对抗的数据
+#############################
 def _t2n(x):
     return x.detach().cpu().numpy()
 
@@ -24,17 +27,17 @@ class bc_runner(JSBSimRunner):
         self.init_elo = self.all_args.init_elo
         self.latest_elo = self.init_elo
 
-        # policy & algorithm
+        # 创建并加载专家智能体模型
         if self.algorithm_name == "ppo":
             from algorithms.ppo.ppo_policy import PPOPolicy as Policy
         elif self.algorithm_name == "dsac":
             from algorithms.dsac.dsac_policy import DSACPolicy as Policy
         else:
             raise NotImplementedError
-
-
         self.policy = Policy(self.all_args, self.obs_space, self.act_space, device=self.device)
-
+        actor_path = "/home/sdj/home/sdj/graduation/final/LAG-1/scripts/train/data_collect/MEPPO+20thread+GRU/actor_latest.pt"
+        policy_actor_state_dict = torch.load(actor_path, weights_only=True)
+        self.policy.actor.load_state_dict(policy_actor_state_dict, strict=False)
         # buffer
         self.buffer = ReplayBuffer(self.all_args, self.num_agents // 2, self.obs_space, self.act_space)
 
@@ -47,6 +50,9 @@ class bc_runner(JSBSimRunner):
             .format(self.num_opponents, self.n_rollout_threads)
         self.policy_pool = {}  # type: dict[str, float]
         self.opponent_policy = [Policy(self.all_args, self.obs_space, self.act_space, device=self.device)]
+        # 让对手智能体也加载相同的预训练模型
+        self.opponent_policy[0].actor.load_state_dict(policy_actor_state_dict, strict=False)
+        
         self.opponent_env_split = np.array_split(np.arange(self.n_rollout_threads), len(self.opponent_policy))
         self.opponent_obs = np.zeros_like(self.buffer.obs[0])
         self.opponent_rnn_states = np.zeros_like(self.buffer.rnn_states_actor[0])
@@ -55,9 +61,7 @@ class bc_runner(JSBSimRunner):
         logging.info("\n Load selfplay opponents: Algo {}, num_opponents {}.\n"
                         .format(self.all_args.selfplay_algorithm, self.num_opponents))
 
-        actor_path = "/home/sdj/home/sdj/graduation/final/LAG-1/scripts/train/data_collect/MEPPO+20thread+GRU/actor_latest.pt"
-        policy_actor_state_dict = torch.load(actor_path, weights_only=True)
-        self.policy.actor.load_state_dict(policy_actor_state_dict, strict=False)
+
 
     @torch.no_grad()
     def collect(self, step):
@@ -109,4 +113,4 @@ class bc_runner(JSBSimRunner):
         with open("scripts/train/data_collect/data.txt", 'a') as f:
             f.write(str(data))
             f.write("\n")
-            
+

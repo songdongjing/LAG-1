@@ -26,7 +26,7 @@ def main(args):
     #算法参数设置，在parameter.py中设置
     parser = get_config()
     all_args = parse_args(args, parser)
-    all_args = input_args(all_args,"ppo")
+    all_args = input_args(all_args,"ppo",vsbaseline=True)
     all_args.use_wandb=False
 
     # seed

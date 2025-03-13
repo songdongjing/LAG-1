@@ -58,8 +58,8 @@ class ACTLayer(nn.Module):
 
         if self._mlp_actlayer:
             x = self.mlp(x)
-            if deterministic == False:
-               x = self.transformer(x, self.memory)
+            # if deterministic == False:
+            #    x = self.transformer(x, self.memory)
         if self._multidiscrete_action:
             actions = []
             action_log_probs = []

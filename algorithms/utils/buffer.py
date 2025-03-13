@@ -22,7 +22,7 @@ class Buffer(ABC):
     def clear(self):
         pass
 
-
+#最多可存buffer_size*n_rollout_threads组数据
 class ReplayBuffer(Buffer):
 
     @staticmethod

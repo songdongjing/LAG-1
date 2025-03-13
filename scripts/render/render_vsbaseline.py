@@ -20,8 +20,8 @@ from gymnasium import spaces
 
 
 
-ego_model_dir = "/home/sdj/home/sdj/graduation/final/LAG-1/scripts/train/calcu_winrate/model/ppo_entropy_20thread/actor_latest.pt"
-enm_model_dir = "/home/sdj/home/sdj/graduation/final/LAG-1/scripts/train/calcu_winrate/model/ppo_entropy_20thread/actor_latest.pt"
+ego_model_dir = "/home/sdj/home/sdj/graduation/final/LAG-1/scripts/train/data_collect/MEPPO+20thread+GRU/actor_latest.pt"
+enm_model_dir = "/home/sdj/home/sdj/graduation/final/LAG-1/scripts/train/data_collect/MEPPO+20thread+GRU/actor_latest.pt"
 class Args:
     def __init__(self) -> None:
         self.gain = 0.01
@@ -49,9 +49,9 @@ def _t2n(x):
 #任务定义为
 
 def fight_render(ego_model, enm_model):
-    vsbaseline = False
+    vsbaseline = True
 
-    env = SingleCombatEnv("1v1/ShootMissile/Selfplay")
+    env = SingleCombatEnv("/home/sdj/home/sdj/graduation/final/LAG-1/envs/JSBSim/configs/1v1/ShootMissile/Selfplay_fardistance")
     num_agents = 2
     args = Args()
     #创建策略模型
@@ -63,14 +63,16 @@ def fight_render(ego_model, enm_model):
     #加载策略模型
     ego_policy.eval()
     enm_policy.eval()
-    ego_policy.load_state_dict(torch.load(ego_model))
-    enm_policy.load_state_dict(torch.load(enm_model))
+
+    # 加载模型
+    ego_policy.load_state_dict(torch.load(ego_model), strict=False)
+    enm_policy.load_state_dict(torch.load(enm_model), strict=False)
 
     episode_opp_rewards=0
     episode_ego_rewards=0
 
     obs = env.reset()
-    env.render(mode='txt', filepath=f'fight.txt.acmi')
+    env.render(mode='txt', filepath=f'scripts/render/fight.txt.acmi')
 
     my_actions=np.random.randint(0, 10, size=(2,4))
     my_actions=my_actions.astype(np.float32)
@@ -101,7 +103,7 @@ def fight_render(ego_model, enm_model):
         episode_opp_rewards += rewards_opp
         episode_ego_rewards += rewards_ego
 
-        env.render(mode='txt', filepath=f'fight.txt.acmi')
+        env.render(mode='txt', filepath=f'scripts/render/fight.txt.acmi')
         if dones.all():
             break
         enm_obs =  obs[num_agents // 2:, ...]

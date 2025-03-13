@@ -91,17 +91,7 @@ def env_parallel(ego_model, enm_model, seed):
     ego_policy = PPOActor(ego_args, observation_space, act_space, device)
     enm_policy = PPOActor(enm_args, observation_space, act_space, device)
     ego_policy.load_state_dict(torch.load(ego_model))
-    
-    # 使用dodge_missile_model.pt作为敌方模型
-    dodge_missile_path = "/home/sdj/home/sdj/graduation/final/LAG-1/envs/JSBSim/model/dodge_missile_model.pt"
-    try:
-        print(f"正在加载敌方闪避导弹模型: {dodge_missile_path}")
-        enm_policy.load_state_dict(torch.load(dodge_missile_path))
-        print(f"成功加载dodge_missile_model.pt")
-    except Exception as e:
-        print(f"加载dodge_missile_model.pt失败: {e}")
-        print(f"回退使用默认模型: {enm_model}")
-        enm_policy.load_state_dict(torch.load(enm_model))
+    enm_policy.load_state_dict(torch.load(enm_model))
 
     episode_opp_rewards = 0
     episode_ego_rewards = 0
@@ -170,11 +160,11 @@ def caculate_task(ego_agent, enm_agent):
 
 def main():
     winrate_list=[]
-    count=100
+    count=400
     for i in range(count):
-        ego_model=ego_model_dir+f"/actor_"+str(i)+".pt"
-        # enm_model=ego_model_dir+f"/actor_"+str(j+100)+".pt"
-        enm_model=baseline_model_dir+f"/actor_100.pt"
+        ego_model=ego_model_dir+f"/actor_"+str(970)+".pt"
+        enm_model=ego_model_dir+f"/actor_"+str(i)+".pt"
+        # enm_model=baseline_model_dir+f"/actor_100.pt"
         winrate_list.append([i,caculate_task(ego_model,enm_model)])
 
     #将winrate_list写入一个文件

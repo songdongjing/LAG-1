@@ -3,7 +3,7 @@ from envs.env_wrappers import SubprocVecEnv, DummyVecEnv
 from runner.tacview import Tacview
 import wandb
 import socket
-
+import random
 def make_train_env(all_args):
     def get_env_fn(rank):
         def init_env():
@@ -50,17 +50,24 @@ def parse_args(args, parser):
     return all_args
 
 #算法参数配置
-#所有的参数可以在
-def input_args(all_args,algorithm_name="dsac"):
+
+#所有的参数可以在config.py中设置
+def input_args(all_args,algorithm_name="ppo",vsbaseline=False):
     all_args.env_name = "SingleCombat" #1V1空战环境 
     all_args.algorithm_name = algorithm_name  #算法名称
-    all_args.scenario_name = "1v1/ShootMissile/Selfplay" #环境名称
-    # all_args.scenario_name = "1v1/ShootMissile/VsBaseline_nolimitSelfpaly"
+    if vsbaseline:
+        all_args.scenario_name = "1v1/ShootMissile/VsBaseline_nolimitSelfpaly"
+        all_args.use_selfplay=False
+    else:
+        all_args.scenario_name = "/home/sdj/home/sdj/graduation/final/LAG-1/envs/JSBSim/configs/1v1/ShootMissile/Selfplay_fardistance" #环境名称
+        all_args.use_selfplay=False
+        all_args.selfplay_algorithm="pfsp" #优先级自博弈
     all_args.experiment_name = "v1" #实验名称
+    all_args.use_prior=True #alpha-beta分布先验
 
-    all_args.seed = 1
+    all_args.seed = random.randint(0, 1000000)
     all_args.n_training_threads = 1
-    all_args.n_rollout_threads = 20
+    all_args.n_rollout_threads = 1
     all_args.cuda = True
     all_args.log_interval=1
     all_args.save_interval = 1
@@ -72,7 +79,7 @@ def input_args(all_args,algorithm_name="dsac"):
 
     all_args.num_mini_batch = 5
     all_args.buffer_size = 1500
-    all_args.num_env_steps = 3e9
+    all_args.num_env_steps = 5e5
     all_args.max_grad_norm = 0.5
 
     all_args.lr = 3e-4
@@ -92,11 +99,6 @@ def input_args(all_args,algorithm_name="dsac"):
     all_args.recurrent_hidden_size = 128
     all_args.recurrent_hidden_layers = 1
     all_args.data_chunk_length = 8
-
-
-    all_args.use_selfplay=True
-    all_args.use_prior=True
-    all_args.selfplay_algorithm="fsp"
 
     # 
     return all_args
