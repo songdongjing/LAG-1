@@ -143,18 +143,18 @@ class SingleCombatShootMissileTask(SingleCombatDodgeMissileTask):
     def load_action_space(self):
         # aileron, elevator, rudder, throttle, shoot control
         self.action_space = spaces.Tuple([spaces.MultiDiscrete([41, 41, 41, 30]), spaces.Discrete(2)])
-    
+
     def get_obs(self, env, agent_id):
         return super().get_obs(env, agent_id)
-    
+
     def normalize_action(self, env, agent_id, action):
-        if self.baseline_agent and agent_id in env.enm_ids: # 如果使用baseline，则不进行射击,为了兼容其基类
+        if self.use_baseline and agent_id in env.enm_ids: # 如果使用baseline，则不进行射击,为了兼容其基类
             self._shoot_action[agent_id]=0
             return super().normalize_action(env, agent_id, action)
         else:
             self._shoot_action[agent_id] = action[-1]
         return super().normalize_action(env, agent_id, action[:-1].astype(np.int32))
-    
+
     def reset(self, env):
         self._shoot_action = {agent_id: 0 for agent_id in env.agents.keys()}
         self.remaining_missiles = {agent_id: agent.num_missiles for agent_id, agent in env.agents.items()}

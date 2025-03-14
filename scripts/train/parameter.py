@@ -61,7 +61,7 @@ def input_args(all_args,algorithm_name="ppo",vsbaseline=False,render_mode="txt")
         all_args.scenario_name = "1v1/ShootMissile/VsBaseline_nolimitSelfpaly"
         all_args.use_selfplay=False
     else:
-        all_args.scenario_name = "/home/sdj/home/sdj/graduation/final/LAG-1/envs/JSBSim/configs/1v1/ShootMissile/Selfplay_fardistance" #环境名称
+        all_args.scenario_name = "1v1/ShootMissile/Selfplay_fardistance" #环境名称
         all_args.use_selfplay=False
         all_args.selfplay_algorithm="pfsp" #优先级自博弈
     all_args.experiment_name = "学习率1e-4" #实验名称

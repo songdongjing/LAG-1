@@ -162,7 +162,10 @@ class JSBSimRunner(Runner):
         eval_rnn_states = np.zeros((self.n_eval_rollout_threads, *self.buffer.rnn_states_actor.shape[2:]), dtype=np.float32)
 
         self.timestamp = 0 # use for tacview real time render 
-        
+        if self.render_mode == "real_time" and self.tacview: #重新连接
+            print("重新连接tacview.....")
+            self.tacview.reconnect()
+
         while total_episodes < self.eval_episodes:
 
             self.policy.prep_rollout()
@@ -191,8 +194,9 @@ class JSBSimRunner(Runner):
                     self.tacview.send_data_to_client(render_data_str)
                 except Exception as e:
                     logging.error(f"Tacview rendering error: {e}")
-
             self.timestamp += 0.2   # step 0.2s
+
+            
             eval_cumulative_rewards += eval_rewards
             eval_dones_env = np.all(eval_dones.squeeze(axis=-1), axis=-1)
             total_episodes += np.sum(eval_dones_env)
