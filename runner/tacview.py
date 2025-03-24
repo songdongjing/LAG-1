@@ -4,7 +4,7 @@ import time
 class Tacview(object):
     def __init__(self):
         self.host = "192.168.3.51"
-        self.port = 41235
+        self.port = 12345
         self.setup_server()
         
     def setup_server(self):

@@ -29,7 +29,7 @@ class bc_runner(JSBSimRunner):
 
         # 创建并加载专家智能体模型
         if self.algorithm_name == "ppo":
-            from algorithms.ppo.ppo_policy import PPOPolicy as Policy
+            from algorithms.ppo.ppo_policy_backup import PPOPolicy as Policy
         elif self.algorithm_name == "dsac":
             from algorithms.dsac.dsac_policy import DSACPolicy as Policy
         else:

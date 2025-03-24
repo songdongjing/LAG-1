@@ -48,7 +48,7 @@ def main(args):
         torch.set_num_threads(all_args.n_training_threads)
 
     # run dir
-    name="PPO training"  #训练文件名字
+    name="GRU_TEST3"  #训练文件名字
     run_dir = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/results") \
         / all_args.env_name / all_args.scenario_name / all_args.algorithm_name / all_args.experiment_name / name
     print("工作目录为",run_dir)
@@ -77,7 +77,7 @@ def main(args):
 
     # run experiments
     if all_args.use_selfplay:
-        from runner.selfplay_jsbsim_runner import SelfplayJSBSimRunner as Runner # 实际运行在这里调用了
+        from runner.selfplay_jsbsim_runner import SelfplayJSBSimRunner as Runner 
     else:
         from runner.jsbsim_runner import JSBSimRunner as Runner
     runner = Runner(config)

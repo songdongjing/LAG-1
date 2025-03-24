@@ -7,7 +7,7 @@ import torch
 from envs.JSBSim.envs import SingleCombatEnv, SingleControlEnv, MultipleCombatEnv
 from envs.env_wrappers import SubprocVecEnv, DummyVecEnv
 from envs.JSBSim.core.catalog import Catalog as c
-from algorithms.ppo.ppo_actor import PPOActor
+from algorithms.ppo.ppo_actor_backup import PPOActor
 import logging
 from multiprocessing import Pool
 logging.basicConfig(level=logging.DEBUG)

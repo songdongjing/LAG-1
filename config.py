@@ -160,6 +160,9 @@ def _get_recurrent_config(parser: argparse.ArgumentParser):
                        help="The number of recurrent layers (default 1)")
     group.add_argument("--data-chunk-length", type=int, default=10,
                        help="Time length of chunks used to train a recurrent_policy (default 10)")
+    
+    group.add_argument("--use-transformer", action='store_true', default=False,
+                       help="Whether to use transformer")
     return parser
 
 

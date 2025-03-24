@@ -56,20 +56,19 @@ def input_args(all_args,algorithm_name="ppo",vsbaseline=False,render_mode="txt")
     all_args.env_name = "SingleCombat" #1V1空战环境 
     all_args.algorithm_name = algorithm_name  #算法名称
     all_args.render_mode = render_mode #渲染模式
-    all_args.eval_interval = 1
     if vsbaseline:
         all_args.scenario_name = "1v1/ShootMissile/VsBaseline_nolimitSelfpaly"
         all_args.use_selfplay=False
     else:
-        all_args.scenario_name = "1v1/ShootMissile/Selfplay_fardistance" #环境名称
-        all_args.use_selfplay=False
+        all_args.scenario_name = "1v1/ShootMissile/Selfplay" #环境名称
+        all_args.use_selfplay=True
         all_args.selfplay_algorithm="pfsp" #优先级自博弈
-    all_args.experiment_name = "学习率1e-4" #实验名称
+    all_args.experiment_name = "eval_interval1test" #实验名称
     all_args.use_prior=True #alpha-beta分布先验
 
     all_args.seed = random.randint(0, 1000000)
     all_args.n_training_threads = 1
-    all_args.n_rollout_threads = 1
+    all_args.n_rollout_threads = 20
     all_args.cuda = True
     all_args.log_interval=1
     all_args.save_interval = 1
@@ -80,8 +79,8 @@ def input_args(all_args,algorithm_name="ppo",vsbaseline=False,render_mode="txt")
     all_args.eval_episodes = 1
 
     all_args.num_mini_batch = 5
-    all_args.buffer_size = 1500
-    all_args.num_env_steps = 5e5
+    all_args.buffer_size = 300
+    all_args.num_env_steps = 2e7
     all_args.max_grad_norm = 0.5
 
     all_args.lr =1e-4
@@ -101,5 +100,8 @@ def input_args(all_args,algorithm_name="ppo",vsbaseline=False,render_mode="txt")
     all_args.recurrent_hidden_layers = 1
     all_args.data_chunk_length = 8
 
-    # 
+    # 使用transformer
+    all_args.use_transformer=False
+
+
     return all_args

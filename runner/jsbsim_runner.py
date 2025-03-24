@@ -20,8 +20,8 @@ class JSBSimRunner(Runner):
 
         # policy & algorithm
         if self.algorithm_name == "ppo":
-            from algorithms.ppo.ppo_trainer import PPOTrainer as Trainer
-            from algorithms.ppo.ppo_policy import PPOPolicy as Policy
+            from algorithms.ppo.ppo_trainer_backup import PPOTrainer as Trainer
+            from algorithms.ppo.ppo_policy_backup import PPOPolicy as Policy
         elif self.algorithm_name == "dsac":
             from algorithms.dsac.dsac_trainer import DSACTrainer as Trainer
             from algorithms.dsac.dsac_policy import DSACPolicy as Policy
