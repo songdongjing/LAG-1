@@ -48,7 +48,7 @@ def main(args):
         torch.set_num_threads(all_args.n_training_threads)
 
     # run dir
-    name="GRU_TEST3"  #训练文件名字
+    name="GRU_TEST_1"  #训练文件名字
     run_dir = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/results") \
         / all_args.env_name / all_args.scenario_name / all_args.algorithm_name / all_args.experiment_name / name
     print("工作目录为",run_dir)
