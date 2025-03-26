@@ -23,20 +23,13 @@ class JSBSimRunner(Runner):
             from algorithms.ppo.ppo_trainer_backup import PPOTrainer as Trainer
             from algorithms.ppo.ppo_policy_backup import PPOPolicy as Policy
         elif self.algorithm_name == "dsac":
-            from algorithms.dsac.dsac_trainer import DSACTrainer as Trainer
-            from algorithms.dsac.dsac_policy import DSACPolicy as Policy
-            from algorithms.dsac.dsac_policy import DSACCritic as Critic
+            from algorithms.dsa3c_gru_gtrxl.dsac_trainer import DSACTrainer as Trainer
+            from algorithms.dsa3c_gru_gtrxl.dsac_policy import DSACPolicy as Policy
         else:
             raise NotImplementedError
 
         if self.algorithm_name == "dsac":
             self.policy = Policy(self.all_args, self.obs_space, self.act_space, device=self.device)
-            self.critic1 = Critic(self.all_args, self.envs.observation_space, self.device)
-            self.critic2 = Critic(self.all_args, self.envs.observation_space, self.device)
-            self.target_critic1 = Critic(self.all_args, self.envs.observation_space, self.device)
-            self.target_critic2 = Critic(self.all_args, self.envs.observation_space, self.device)
-            self.target_critic1.load_state_dict(self.critic1.state_dict())
-            self.target_critic2.load_state_dict(self.critic2.state_dict())
             self.trainer = Trainer(self.all_args, device=self.device)
         elif self.algorithm_name == "ppo":
             self.policy = Policy(self.all_args, self.obs_space, self.act_space, device=self.device)

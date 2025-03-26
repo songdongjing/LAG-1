@@ -26,7 +26,7 @@ def main(args):
     #算法参数设置，在parameter.py中设置
     parser = get_config()
     all_args = parse_args(args, parser)
-    all_args = input_args(all_args,"ppo",vsbaseline=False,render_mode="real_time")
+    all_args = input_args(all_args,"ppo",vsbaseline=True,render_mode="real_time")
     all_args.use_wandb=False
 
     # seed
@@ -48,7 +48,7 @@ def main(args):
         torch.set_num_threads(all_args.n_training_threads)
 
     # run dir
-    name="GRU_TEST_1"  #训练文件名字
+    name="Transformer_TEST_2"  #训练文件名字
     run_dir = Path(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/results") \
         / all_args.env_name / all_args.scenario_name / all_args.algorithm_name / all_args.experiment_name / name
     print("工作目录为",run_dir)
