@@ -22,17 +22,17 @@ class DSACActor(nn.Module):
         self.recurrent_hidden_layers = args.recurrent_hidden_layers
         self.tpdv = dict(dtype=torch.float32, device=device)
         self.use_prior = args.use_prior
-        ##添加GRU
-        if self.use_recurrent_policy:
-            # Define observation and action dimensions
-            self.obs_dim = obs_space.shape[0]  # Assuming obs_space is a Box or similar
-            self.action_dim = act_space.shape[0]  # Assuming act_space is a Box or similar
+        #添加GRU
+        # if self.use_recurrent_policy:
+        #     # Define observation and action dimensions
+        #     self.obs_dim = obs_space.shape[0]  # Assuming obs_space is a Box or similar
+        #     self.action_dim = act_space.shape[0]  # Assuming act_space is a Box or similar
 
-            # Add GRU layer
-            self.gru = nn.GRU(self.obs_dim, self.hidden_size, batch_first=True)
+        #     # Add GRU layer
+        #     self.gru = nn.GRU(self.obs_dim, self.hidden_size, batch_first=True)
 
-            # Add fully connected layer
-            self.fc = nn.Linear(self.hidden_size, self.action_dim * 2)  # 输出均值和标准差
+        #     # Add fully connected layer
+        #     self.fc = nn.Linear(self.hidden_size, self.action_dim * 2)  # 输出均值和标准差
 
         # (1) feature extraction module
         self.base = MLPBase(obs_space, self.hidden_size, self.activation_id, self.use_feature_normalization)
@@ -64,26 +64,26 @@ class DSACActor(nn.Module):
             beta0[attack_angle <= 45] = 6
             beta0[attack_angle <= 22.5] = 3
         ##添加GRU
-        if self.use_recurrent_policy:
-            # Add GRU logic
-            gru_out, new_hidden = self.gru(obs, rnn_states)  # Pass rnn_states as hidden_state
-            mean, log_std = self.fc(gru_out).chunk(2, dim=-1)  # Split the output into mean and log_std
-            actor_features = mean  # Use the mean from the GRU as actor_features
-        else:
+        # if self.use_recurrent_policy:
+        #     # Add GRU logic
+        #     gru_out, new_hidden = self.gru(obs, rnn_states)  # Pass rnn_states as hidden_state
+        #     mean, log_std = self.fc(gru_out).chunk(2, dim=-1)  # Split the output into mean and log_std
+        #     actor_features = mean  # Use the mean from the GRU as actor_features
+        # else:
             actor_features = self.base(obs)
 
-        # if self.use_recurrent_policy:
-        #    actor_features, rnn_states = self.rnn(actor_features, rnn_states, masks)
+        if self.use_recurrent_policy:
+           actor_features, rnn_states = self.rnn(actor_features, rnn_states, masks)
 
         if self.use_prior:
             actions, action_log_probs = self.act(actor_features, deterministic, alpha0=alpha0, beta0=beta0)
         else:
             actions, action_log_probs = self.act(actor_features, deterministic)
 
-        if self.use_recurrent_policy:
-            return actions, action_log_probs, new_hidden  # Return new_hidden as rnn_states
-        else:
-            return actions, action_log_probs, rnn_states
+        # if self.use_recurrent_policy:
+        #     return actions, action_log_probs, new_hidden  # Return new_hidden as rnn_states
+        # else:
+        return actions, action_log_probs, rnn_states
 
     def evaluate_actions(self, obs, rnn_states, action, masks, active_masks=None):
         obs = check(obs).to(**self.tpdv)

@@ -95,24 +95,33 @@ class DSACTrainer():
         self.soft_update(policy.critic1, policy.target_critic1)
         self.soft_update(policy.critic2, policy.target_critic2)
         self.soft_update(policy.critic3, policy.target_critic3)
-        return actor_loss
+        return actor_loss, critic_1_loss,critic_2_loss,critic_3_loss, alpha_loss
 
 
 
     def train(self, policy: DSACPolicy, buffer: Union[ReplayBuffer, List[ReplayBuffer]]):
         train_info = {}  #TODO 需要添加一些观测数据
+        train_info['value1_loss'] = 0
+        train_info['value2_loss'] = 0
+        train_info['value3_loss'] = 0
+        train_info['policy_loss'] = 0
+        train_info['policy_entropy_loss'] = 0
 
 
         if self.use_recurrent_policy:
             data_generator = ReplayBuffer.recurrent_generator(buffer, self.num_mini_batch, self.data_chunk_length)
-        if self.use_transformer:
+        elif self.use_transformer:
             data_generator = ReplayBuffer.recurrent_generator(buffer, self.num_mini_batch, self.data_chunk_length)
         else:
             raise NotImplementedError
 
         for sample in data_generator:
-            self.dsac_update(policy, sample)
-
+            actor_loss, critic_1_loss,critic_2_loss,critic_3_loss, alpha_loss =self.dsac_update(policy, sample)
+            train_info['value1_loss'] += critic_1_loss.item()
+            train_info['value2_loss'] += critic_2_loss.item()
+            train_info['value3_loss'] += critic_3_loss.item()
+            train_info['policy_loss'] += actor_loss.item()
+            train_info['policy_entropy_loss'] += alpha_loss.item()
 
         for k in train_info.keys():
             train_info[k] /= self.num_mini_batch

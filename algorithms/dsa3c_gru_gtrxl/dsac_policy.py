@@ -29,19 +29,19 @@ class DSACPolicy:
         self.target_critic3.load_state_dict(self.critic3.state_dict())
 
         self.optimizer_actor = torch.optim.Adam([
-            {'actor.params': self.actor.parameters()},
+            {'params': self.actor.parameters()},
         ], lr=self.lr)
 
         self.optimizer_critic1 = torch.optim.Adam([
-            {'critic1.params': self.critic1.parameters()},
+            {'params': self.critic1.parameters()},
         ], lr=self.lr)
 
         self.optimizer_critic2 = torch.optim.Adam([
-            {'critic2.params': self.critic2.parameters()},
+            {'params': self.critic2.parameters()},
         ], lr=self.lr)
 
         self.optimizer_critic3 = torch.optim.Adam([
-            {'critic3.params': self.critic3.parameters()},
+            {'params': self.critic3.parameters()},
         ], lr=self.lr)
 
     def get_actions(self, obs, rnn_states_actor, rnn_states_critic, masks):
@@ -67,7 +67,7 @@ class DSACPolicy:
         values = self.average_of_two_smallest(values1, values2, values3)
         return values
 
-    def average_of_two_smallest(val1, val2, val3):
+    def average_of_two_smallest(self, val1, val2, val3):
         """
         计算三个张量中最小两个值的平均值。
 

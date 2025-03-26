@@ -22,7 +22,7 @@ class DSACCritic(nn.Module):
 
         # 公共维度定义
         self.obs_dim = obs_space.shape[0]
-        self.action_dim = args.action_dim
+        self.action_dim = args.action_dim if hasattr(args, 'action_dim') else 0
         self.device = device
 
         # 公共模块初始化
@@ -84,14 +84,16 @@ class DSACCritic(nn.Module):
             critic_features, rnn_states = self.rnn(critic_features, rnn_states, masks)
 
         # GRU处理 (原第一个版本特有)
-        if self.use_recurrent_policy:
-            if hasattr(self, 'gru'):
-                critic_features = critic_features.unsqueeze(1)
-                rnn_states = rnn_states.unsqueeze(0)
-                critic_features, rnn_states = self.gru(critic_features, rnn_states)
-                critic_features = critic_features.squeeze(1)
-                rnn_states = rnn_states.squeeze(0)
+        # if self.use_recurrent_policy:
+        #     if hasattr(self, 'rnn'):
+        #         critic_features = critic_features.unsqueeze(1)
+        #         rnn_states = rnn_states.unsqueeze(0)
+        #         critic_features, rnn_states = self.rnn(critic_features, rnn_states, masks)
+        #         critic_features = critic_features.squeeze(1)
+        #         rnn_states = rnn_states.squeeze(0)
+               # RNN处理
 
+        q_values = None
         # GTrXL处理 (原第二个版本特有)
         if self.use_transformer:
             q_values = None
